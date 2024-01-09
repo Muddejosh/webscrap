@@ -1,0 +1,22 @@
+# Use the official Codespaces image
+FROM mcr.microsoft.com/vscode/devcontainers/universal:linux
+
+# Install Chrome
+RUN sudo apt-get update && \
+    sudo apt-get install -y wget && \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - && \
+    sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
+    sudo apt-get update && \
+    sudo apt-get install -y google-chrome-stable && \
+    sudo rm -rf /var/lib/apt/lists/*
+
+# Set up a non-root user
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && chsh -s /bin/bash $USERNAME
+
+# Switch to the non-root user
+USER $USERNAME
